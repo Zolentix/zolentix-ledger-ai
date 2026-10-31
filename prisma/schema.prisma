@@ -1,0 +1,33 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  fileName    String
+  vendor      String
+  date        String
+  subtotal    Float
+  tax         Float
+  total       Float
+  currency    String   @default("EUR")
+  status      String   @default("extracted") // extracted, reviewed, approved
+  confidence  Float    @default(0.92)
+  extractedAt DateTime @default(now())
+  lineItems   LineItem[]
+}
+
+model LineItem {
+  id          String   @id @default(cuid())
+  description String
+  quantity    Int      @default(1)
+  unitPrice   Float
+  total       Float
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id])
+}
